@@ -47,7 +47,9 @@ setprecision(Interval, Float64)
     @test extended_div(interval(1.0, 2.0), interval(-4.0, 4.0)) == ((-∞.. -0.25), (0.25..∞))
     @test extended_div(interval(-2.0, -1.0), interval(-2.0, 4.0)) == ((-∞.. -0.25), (0.5..∞))
     @test extended_div(interval(0.0, 0.0), interval(-1.0, 1.0)) == (entireinterval(c), emptyinterval(c))
-
+    @test extended_div(2..10, -2..5) == (Interval(-Inf, -1.0), Interval(0.39999999999999997, Inf))
+    @test extended_div(2..5, 2..5) == (Interval(0.39999999999999997, 2.5), ∅)
+    @test extended_div(2..5, -5.. -2) == (Interval(-2.5, -0.39999999999999997), ∅)
 
     a = @interval(1.e-20)
     @test a == Interval(1.0e-20, 1.0000000000000001e-20)
@@ -114,9 +116,15 @@ end
     setprecision(Interval, 256)
     x = @biginterval(27)
     y = x^(1//3)
-    @test (0 < diam(y) < 1e-76)
+    @test diam(y) == 0
     y = x^(1/3)
-    @test (0 < diam(y) < 1e-76)
+    @test (0 <= diam(y) < 1e-76)
+    x = @biginterval(9.595703125)
+    y = x^(1//3)
+    @test diam(y) == 0
+    x = @biginterval(0.1)
+    y = x^(1//3)
+    @test (0 <= diam(y) < 1e-76)
 
 end
 
